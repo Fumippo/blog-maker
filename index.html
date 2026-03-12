@@ -1,0 +1,2582 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>気ままブログUI - 実用寄りロング版</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --bg-soft: #eef3fb;
+      --panel: #ffffff;
+      --panel-2: #f8fbff;
+      --text: #142033;
+      --muted: #5f6f86;
+      --line: #d6e1ef;
+      --line-strong: #c6d4e6;
+      --accent: #2563eb;
+      --accent-2: #7c3aed;
+      --accent-soft: rgba(37, 99, 235, 0.1);
+      --success: #0f9d58;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 22px 48px rgba(15, 23, 42, 0.12);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", Meiryo, sans-serif;
+    }
+
+    body.dark {
+      --bg: #08111f;
+      --bg-soft: #0d1728;
+      --panel: #0d1729;
+      --panel-2: #0f1d34;
+      --text: #edf4ff;
+      --muted: #9aa9bf;
+      --line: #1d2d48;
+      --line-strong: #294060;
+      --accent: #60a5fa;
+      --accent-2: #a78bfa;
+      --accent-soft: rgba(96, 165, 250, 0.14);
+      --success: #34d399;
+      --warning: #f59e0b;
+      --danger: #f87171;
+      --shadow: 0 14px 36px rgba(0, 0, 0, 0.34);
+      --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.44);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: radial-gradient(circle at top right, rgba(124,58,237,0.07), transparent 22%), radial-gradient(circle at left top, rgba(37,99,235,0.08), transparent 28%), var(--bg);
+      color: var(--text);
+      transition: background .25s ease, color .25s ease;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+    button, input, select, textarea { font: inherit; }
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      outline: none;
+      border-radius: var(--radius-sm);
+      transition: .2s ease;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px var(--accent-soft);
+    }
+
+    .container {
+      width: min(1280px, calc(100% - 28px));
+      margin: 0 auto;
+    }
+
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      width: 0%;
+      z-index: 9999;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 18px rgba(37,99,235,0.45);
+    }
+
+    .app-shell {
+      min-height: 100vh;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 80;
+      backdrop-filter: blur(14px);
+      background: color-mix(in srgb, var(--bg) 80%, transparent);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .site-header-inner {
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      font-weight: 900;
+      font-size: 1.15rem;
+      box-shadow: var(--shadow);
+      flex: 0 0 auto;
+    }
+
+    .brand-copy {
+      min-width: 0;
+    }
+
+    .brand-title {
+      font-weight: 900;
+      letter-spacing: .01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand-sub {
+      color: var(--muted);
+      font-size: .84rem;
+      margin-top: 2px;
+    }
+
+    .desktop-nav {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .desktop-nav a {
+      color: var(--muted);
+      font-weight: 700;
+      font-size: .96rem;
+      transition: .2s ease;
+    }
+
+    .desktop-nav a:hover { color: var(--text); }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 0 0 auto;
+    }
+
+    .btn, .icon-btn, .ghost-btn, .soft-btn {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      cursor: pointer;
+      transition: .2s ease;
+      border-radius: 14px;
+      font-weight: 700;
+    }
+
+    .btn:hover, .icon-btn:hover, .ghost-btn:hover, .soft-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+
+    .btn {
+      padding: 12px 16px;
+    }
+
+    .ghost-btn {
+      background: transparent;
+      padding: 12px 16px;
+    }
+
+    .soft-btn {
+      background: var(--panel-2);
+      padding: 10px 14px;
+    }
+
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      display: inline-grid;
+      place-items: center;
+      padding: 0;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .mobile-toggle {
+      display: none;
+    }
+
+    .mobile-panel {
+      display: none;
+      padding: 0 0 18px;
+    }
+
+    .mobile-panel.open {
+      display: block;
+    }
+
+    .mobile-panel-inner {
+      display: grid;
+      gap: 10px;
+    }
+
+    .mobile-panel a,
+    .mobile-panel button {
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      text-align: left;
+      color: var(--text);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .hero {
+      padding: 28px 0 18px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.4fr .9fr;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .hero-card, .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-main {
+      overflow: hidden;
+      position: relative;
+      padding: 30px;
+      background:
+        radial-gradient(circle at 100% 0%, rgba(124,58,237,.16), transparent 24%),
+        radial-gradient(circle at 0% 100%, rgba(37,99,235,.14), transparent 26%),
+        var(--panel);
+    }
+
+    .hero-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 800;
+      font-size: .88rem;
+      margin-bottom: 14px;
+    }
+
+    .hero-main h1 {
+      margin: 0;
+      font-size: clamp(2.2rem, 5vw, 4.1rem);
+      line-height: 1.08;
+      letter-spacing: -.02em;
+    }
+
+    .hero-main p {
+      margin: 18px 0 0;
+      color: var(--muted);
+      max-width: 50em;
+      font-size: 1rem;
+      line-height: 1.9;
+    }
+
+    .hero-actions {
+      margin-top: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .hero-side {
+      padding: 18px;
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .mini-panel {
+      padding: 16px;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+    }
+
+    .mini-panel-title {
+      font-size: .92rem;
+      font-weight: 900;
+      margin-bottom: 10px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .stat-card {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      background: var(--panel);
+    }
+
+    .stat-card strong {
+      display: block;
+      font-size: 1.25rem;
+      line-height: 1.1;
+    }
+
+    .stat-card span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: .82rem;
+    }
+
+    .dashboard-row {
+      padding: 8px 0 26px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .panel-head h2, .panel-head h3, .sidebar-panel h3 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .panel-sub {
+      color: var(--muted);
+      font-size: .95rem;
+      line-height: 1.6;
+    }
+
+    .filters-panel {
+      padding: 18px;
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: 1.35fr .9fr .8fr .8fr;
+      gap: 12px;
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: .82rem;
+      font-weight: 800;
+      color: var(--muted);
+    }
+
+    .control,
+    .control textarea,
+    .control input,
+    .control select,
+    .editor textarea,
+    .editor input,
+    .editor select {
+      padding: 13px 14px;
+    }
+
+    .tag-filter-row, .chips-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .tag-pill {
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--muted);
+      cursor: pointer;
+      font-size: .82rem;
+      font-weight: 800;
+      transition: .2s ease;
+    }
+
+    .tag-pill:hover {
+      border-color: var(--line-strong);
+      color: var(--text);
+    }
+
+    .tag-pill.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .utility-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .utility-left, .utility-right {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .segmented {
+      display: inline-flex;
+      padding: 5px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--bg-soft);
+      gap: 6px;
+    }
+
+    .segmented button {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      padding: 9px 12px;
+      border-radius: 10px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .segmented button.active {
+      background: var(--panel);
+      color: var(--text);
+      box-shadow: var(--shadow);
+    }
+
+    .results-meta {
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .posts-panel {
+      padding: 18px;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .cards-grid.list-view {
+      grid-template-columns: 1fr;
+    }
+
+    .post-card {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--panel);
+      overflow: hidden;
+      transition: .24s ease;
+      display: grid;
+      min-height: 100%;
+    }
+
+    .post-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .post-card.list {
+      grid-template-columns: minmax(240px, 320px) 1fr;
+    }
+
+    .post-cover {
+      position: relative;
+      aspect-ratio: 16 / 10;
+      overflow: hidden;
+      background:
+        linear-gradient(135deg, rgba(37,99,235,.16), rgba(124,58,237,.18)),
+        linear-gradient(120deg, #dbeafe, #ede9fe);
+    }
+
+    body.dark .post-cover {
+      background:
+        linear-gradient(135deg, rgba(96,165,250,.18), rgba(167,139,250,.18)),
+        linear-gradient(120deg, #0f1d34, #172445);
+    }
+
+    .post-cover::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,.55), transparent 16%),
+        radial-gradient(circle at 80% 28%, rgba(255,255,255,.3), transparent 14%),
+        radial-gradient(circle at 58% 76%, rgba(255,255,255,.25), transparent 18%);
+      opacity: .9;
+    }
+
+    .cover-overlay {
+      position: absolute;
+      inset: auto 14px 14px 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: .78rem;
+      font-weight: 900;
+      background: rgba(15,23,42,.72);
+      color: #fff;
+      backdrop-filter: blur(12px);
+    }
+
+    .post-body {
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .post-meta {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: .84rem;
+      font-weight: 700;
+    }
+
+    .post-title {
+      margin: 0;
+      font-size: 1.08rem;
+      line-height: 1.42;
+      letter-spacing: -.01em;
+    }
+
+    .post-excerpt {
+      margin: 0;
+      color: var(--muted);
+      font-size: .94rem;
+      line-height: 1.8;
+    }
+
+    .post-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      color: var(--accent);
+      font-size: .78rem;
+      font-weight: 800;
+    }
+
+    .post-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .small-btn {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      padding: 9px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 800;
+      font-size: .82rem;
+      transition: .2s ease;
+    }
+
+    .small-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+
+    .small-btn.active-like {
+      background: var(--danger);
+      border-color: transparent;
+      color: #fff;
+    }
+
+    .small-btn.active-save {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-color: transparent;
+      color: #fff;
+    }
+
+    .empty-state {
+      padding: 36px 16px 18px;
+      text-align: center;
+      color: var(--muted);
+      line-height: 1.9;
+    }
+
+    .pagination {
+      margin-top: 18px;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .page-btn {
+      min-width: 44px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .page-btn.active {
+      border-color: transparent;
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    }
+
+    .sidebar {
+      display: grid;
+      gap: 18px;
+      position: sticky;
+      top: 96px;
+    }
+
+    .sidebar-panel {
+      padding: 18px;
+    }
+
+    .sidebar-stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .mini-post {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 12px 14px;
+      background: var(--panel-2);
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    .mini-post:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+
+    .mini-post strong {
+      display: block;
+      line-height: 1.45;
+      margin-bottom: 6px;
+      font-size: .94rem;
+    }
+
+    .mini-post span {
+      color: var(--muted);
+      font-size: .83rem;
+      line-height: 1.6;
+    }
+
+    .category-tile {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .category-tile small {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .profile-card {
+      display: grid;
+      gap: 14px;
+    }
+
+    .profile-top {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 20px;
+      display: grid;
+      place-items: center;
+      font-size: 1.05rem;
+      font-weight: 900;
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: var(--shadow);
+      flex: 0 0 auto;
+    }
+
+    .profile-card p, .editor-note, .foot-note {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.85;
+      font-size: .92rem;
+    }
+
+    .newsletter-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .editor {
+      display: grid;
+      gap: 12px;
+    }
+
+    .editor-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .editor textarea {
+      min-height: 148px;
+      resize: vertical;
+    }
+
+    .editor-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .status-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 4px;
+    }
+
+    .status-pill {
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: .78rem;
+      font-weight: 900;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      color: var(--muted);
+    }
+
+    .status-pill.good { color: var(--success); }
+    .status-pill.warn { color: var(--warning); }
+    .status-pill.bad { color: var(--danger); }
+
+    .footer {
+      margin-top: 30px;
+      padding: 26px 0 40px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 10, 24, 0.62);
+      display: none;
+      place-items: center;
+      padding: 18px;
+      z-index: 999;
+    }
+
+    .modal.open {
+      display: grid;
+    }
+
+    .modal-panel {
+      width: min(980px, 100%);
+      max-height: min(92vh, 980px);
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .modal-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--panel) 82%, transparent);
+      backdrop-filter: blur(12px);
+    }
+
+    .modal-body {
+      overflow: auto;
+    }
+
+    .modal-cover {
+      position: relative;
+      aspect-ratio: 16 / 6.7;
+      overflow: hidden;
+      background:
+        linear-gradient(135deg, rgba(37,99,235,.16), rgba(124,58,237,.18)),
+        linear-gradient(120deg, #dbeafe, #ede9fe);
+    }
+
+    body.dark .modal-cover {
+      background:
+        linear-gradient(135deg, rgba(96,165,250,.2), rgba(167,139,250,.18)),
+        linear-gradient(120deg, #10203a, #172749);
+    }
+
+    .modal-cover::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 25% 22%, rgba(255,255,255,.45), transparent 14%),
+        radial-gradient(circle at 76% 30%, rgba(255,255,255,.24), transparent 13%),
+        radial-gradient(circle at 58% 76%, rgba(255,255,255,.18), transparent 16%);
+    }
+
+    .modal-content-wrap {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 0;
+    }
+
+    .modal-main {
+      padding: 22px;
+      min-width: 0;
+    }
+
+    .modal-side {
+      border-left: 1px solid var(--line);
+      padding: 22px 18px;
+      background: var(--panel-2);
+      display: grid;
+      align-content: start;
+      gap: 18px;
+    }
+
+    .modal-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--muted);
+      font-size: .86rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: clamp(1.7rem, 3vw, 2.5rem);
+      line-height: 1.18;
+      letter-spacing: -.02em;
+    }
+
+    .modal-excerpt {
+      color: var(--muted);
+      line-height: 1.85;
+      font-size: 1rem;
+      margin: 16px 0 0;
+    }
+
+    .article-body {
+      margin-top: 18px;
+      line-height: 2;
+      color: var(--text);
+      font-size: 1rem;
+    }
+
+    .article-body h3 {
+      margin: 1.6em 0 .65em;
+      line-height: 1.35;
+      font-size: 1.18rem;
+    }
+
+    .article-body p { margin: 0 0 1em; }
+    .article-body ul {
+      margin: .8em 0 1em 1.2em;
+      padding: 0;
+      line-height: 1.9;
+    }
+
+    .toc-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .toc-link {
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--muted);
+      font-weight: 800;
+      font-size: .85rem;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .related-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .related-item {
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      cursor: pointer;
+    }
+
+    .related-item strong {
+      display: block;
+      font-size: .88rem;
+      line-height: 1.5;
+      margin-bottom: 4px;
+    }
+
+    .related-item span {
+      color: var(--muted);
+      font-size: .78rem;
+    }
+
+    .toast-wrap {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 1200;
+      display: grid;
+      gap: 10px;
+      max-width: min(92vw, 380px);
+    }
+
+    .toast {
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      box-shadow: var(--shadow-lg);
+      display: grid;
+      gap: 4px;
+      animation: slideIn .25s ease;
+    }
+
+    .toast strong {
+      font-size: .92rem;
+      line-height: 1.4;
+    }
+
+    .toast span {
+      color: var(--muted);
+      font-size: .84rem;
+      line-height: 1.6;
+    }
+
+    .back-top {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 200;
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      display: none;
+      place-items: center;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      font-weight: 900;
+    }
+
+    .back-top.show {
+      display: grid;
+    }
+
+    .muted { color: var(--muted); }
+    .hide { display: none !important; }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 1120px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        position: static;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+      .filters-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .cards-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .modal-content-wrap {
+        grid-template-columns: 1fr;
+      }
+      .modal-side {
+        border-left: none;
+        border-top: 1px solid var(--line);
+      }
+    }
+
+    @media (max-width: 760px) {
+      .desktop-nav,
+      .header-actions .desktop-only {
+        display: none;
+      }
+      .mobile-toggle {
+        display: inline-grid;
+      }
+      .site-header-inner {
+        min-height: 70px;
+      }
+      .filters-grid {
+        grid-template-columns: 1fr;
+      }
+      .cards-grid,
+      .cards-grid.list-view {
+        grid-template-columns: 1fr;
+      }
+      .post-card.list {
+        grid-template-columns: 1fr;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+      .editor-grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .container {
+        width: min(100% - 18px, 1280px);
+      }
+      .hero-main,
+      .sidebar-panel,
+      .posts-panel,
+      .filters-panel {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      .hero-main h1 {
+        font-size: clamp(1.92rem, 11vw, 2.45rem);
+      }
+      .footer-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress-bar" id="progressBar"></div>
+  <div class="app-shell">
+    <header class="site-header">
+      <div class="container site-header-inner">
+        <a href="#top" class="brand" aria-label="トップへ移動">
+          <div class="brand-mark">B</div>
+          <div class="brand-copy">
+            <div class="brand-title">気ままブログUI</div>
+            <div class="brand-sub">HTMLだけで開ける・機能多め・実用寄りロング版</div>
+          </div>
+        </a>
+
+        <nav class="desktop-nav" aria-label="グローバルナビゲーション">
+          <a href="#top">ホーム</a>
+          <a href="#postsSection">記事一覧</a>
+          <a href="#sidebarPopular">人気記事</a>
+          <a href="#sidebarEditor">投稿パネル</a>
+          <a href="#sidebarProfile">プロフィール</a>
+        </nav>
+
+        <div class="header-actions">
+          <button class="btn desktop-only" id="themeToggle">🌙 ダーク</button>
+          <button class="btn btn-primary desktop-only" id="openEditorBtn">✍ 投稿を作る</button>
+          <button class="icon-btn mobile-toggle" id="mobileToggle" aria-label="モバイルメニューを開く">☰</button>
+        </div>
+      </div>
+      <div class="container mobile-panel" id="mobilePanel">
+        <div class="mobile-panel-inner">
+          <a href="#top">ホーム</a>
+          <a href="#postsSection">記事一覧</a>
+          <a href="#sidebarPopular">人気記事</a>
+          <a href="#sidebarEditor">投稿パネル</a>
+          <a href="#sidebarProfile">プロフィール</a>
+          <button id="themeToggleMobile">🌙 ダークモード切替</button>
+          <button id="openEditorBtnMobile">✍ 投稿パネルへ移動</button>
+        </div>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="container hero-grid">
+          <div class="hero-card hero-main">
+            <div class="hero-kicker">🔥 まず見た目と導線を勝たせるフェーズ</div>
+            <h1>雑な試作で終わらせず、<br>ちゃんと<span style="color: var(--accent);">使えるブログUI</span>まで持っていく。</h1>
+            <p>
+              「とりあえずブログっぽい見た目」で止めるのは甘いです。今回はその先までやります。
+              検索、カテゴリ、タグ、並び替え、保存、いいね、詳細モーダル、下書き保存、ローカル投稿追加、
+              JSONエクスポートまで全部1ファイルに詰めます。ここまでやれば、さすがに“遊べる試作”じゃなくて
+              “普通に触れる実用品寄り”です。
+            </p>
+            <div class="hero-actions">
+              <a href="#postsSection" class="btn btn-primary">記事一覧を見る</a>
+              <button class="ghost-btn" id="randomPostBtn">ランダム記事を開く</button>
+              <button class="ghost-btn" id="exportJsonBtn">JSONを書き出す</button>
+            </div>
+          </div>
+
+          <aside class="hero-card hero-side">
+            <div class="mini-panel">
+              <div class="mini-panel-title">サイト統計</div>
+              <div class="stats-grid">
+                <div class="stat-card">
+                  <strong id="statPosts">0</strong>
+                  <span>記事数</span>
+                </div>
+                <div class="stat-card">
+                  <strong id="statViews">0</strong>
+                  <span>総閲覧数</span>
+                </div>
+                <div class="stat-card">
+                  <strong id="statSaved">0</strong>
+                  <span>保存数</span>
+                </div>
+              </div>
+            </div>
+            <div class="mini-panel">
+              <div class="mini-panel-title">今日のひとこと</div>
+              <div class="muted" id="dailyMessage" style="line-height:1.85;">
+                最初から完璧を作ろうとして止まるより、ここまで作ってから削る方が強いです。かなり普通の話です。
+              </div>
+            </div>
+            <div class="mini-panel">
+              <div class="mini-panel-title">ショートカット</div>
+              <div class="chips-wrap">
+                <button class="tag-pill" id="shortcutSaved">保存済みだけ</button>
+                <button class="tag-pill" id="shortcutPopular">人気順</button>
+                <button class="tag-pill" id="shortcutRecent">新着順</button>
+                <button class="tag-pill" id="shortcutReset">全解除</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="dashboard-row">
+        <div class="container layout">
+          <div class="stack">
+            <section class="panel filters-panel">
+              <div class="panel-head">
+                <div>
+                  <h2>検索・絞り込み・並び替え</h2>
+                  <div class="panel-sub">雑に盛るんじゃなくて、ちゃんと整理して触りやすくします。ここが弱いと記事数が増えた瞬間に終わります。</div>
+                </div>
+              </div>
+
+              <div class="filters-grid">
+                <label class="control">
+                  <span class="field-label">検索</span>
+                  <input type="text" id="searchInput" placeholder="タイトル・抜粋・タグで検索" />
+                </label>
+                <label class="control">
+                  <span class="field-label">カテゴリ</span>
+                  <select id="categorySelect"></select>
+                </label>
+                <label class="control">
+                  <span class="field-label">並び順</span>
+                  <select id="sortSelect">
+                    <option value="new">新しい順</option>
+                    <option value="old">古い順</option>
+                    <option value="popular">人気順</option>
+                    <option value="likes">いいね順</option>
+                    <option value="readShort">読了時間が短い順</option>
+                    <option value="title">タイトル順</option>
+                  </select>
+                </label>
+                <label class="control">
+                  <span class="field-label">表示件数</span>
+                  <select id="perPageSelect">
+                    <option value="4">4件</option>
+                    <option value="6" selected>6件</option>
+                    <option value="8">8件</option>
+                    <option value="12">12件</option>
+                  </select>
+                </label>
+              </div>
+
+              <div style="margin-top:14px;">
+                <span class="field-label">タグ</span>
+                <div class="tag-filter-row" id="tagFilterRow"></div>
+              </div>
+
+              <div class="utility-row">
+                <div class="utility-left">
+                  <div class="segmented" id="viewToggle">
+                    <button type="button" data-view="grid" class="active">グリッド</button>
+                    <button type="button" data-view="list">リスト</button>
+                  </div>
+                  <label class="soft-btn" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                    <input type="checkbox" id="savedOnlyToggle" style="width:auto;margin:0;accent-color:var(--accent);" />
+                    保存済みだけ表示
+                  </label>
+                </div>
+                <div class="utility-right">
+                  <span class="results-meta" id="resultsMeta">0件表示</span>
+                  <button class="soft-btn" id="clearFiltersBtn">条件を全部解除</button>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel posts-panel" id="postsSection">
+              <div class="panel-head">
+                <div>
+                  <h2>記事一覧</h2>
+                  <div class="panel-sub">カードでもリストでも見られます。いいねも保存もローカルに残るので、ちゃんと触って遊べます。</div>
+                </div>
+                <div class="status-row">
+                  <span class="status-pill good" id="statusPosts">記事 0件</span>
+                  <span class="status-pill warn" id="statusDraft">下書き 0文字</span>
+                  <span class="status-pill" id="statusTheme">テーマ: Light</span>
+                </div>
+              </div>
+
+              <div class="cards-grid" id="cardsGrid"></div>
+              <div class="empty-state hide" id="emptyState">
+                条件に合う記事がありません。<br>
+                そこまで絞って何を探してるのか自分で問い直してください。
+              </div>
+              <div class="pagination" id="pagination"></div>
+            </section>
+          </div>
+
+          <aside class="sidebar">
+            <section class="panel sidebar-panel" id="sidebarPopular">
+              <div class="panel-head">
+                <h3>人気記事</h3>
+                <button class="soft-btn" id="refreshPopularBtn">更新</button>
+              </div>
+              <div class="sidebar-stack" id="popularList"></div>
+            </section>
+
+            <section class="panel sidebar-panel">
+              <div class="panel-head">
+                <h3>カテゴリ</h3>
+              </div>
+              <div class="sidebar-stack" id="categoryTiles"></div>
+            </section>
+
+            <section class="panel sidebar-panel" id="sidebarProfile">
+              <div class="profile-card">
+                <div class="profile-top">
+                  <div class="avatar">KB</div>
+                  <div>
+                    <strong style="display:block; font-size:1rem;">Kenji Blog</strong>
+                    <span class="muted" style="font-size:.86rem;">見た目も導線も雑にしないブログ</span>
+                  </div>
+                </div>
+                <p>
+                  「まず出す、あとで削る」が基本方針です。未完成を恐れて止まるより、ここまで作ってから調整した方が
+                  どう見ても強いです。今回はトップだけじゃなく、投稿追加やローカル保存まで入れてあります。
+                </p>
+                <div class="editor-actions">
+                  <button class="btn btn-primary" id="profilePrimaryBtn">プロフィールを見る</button>
+                  <button class="btn" id="loadDemoBtn">デモを再読込</button>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel sidebar-panel">
+              <div class="panel-head">
+                <h3>ニュースレター</h3>
+              </div>
+              <div class="newsletter-grid">
+                <input type="email" id="newsletterInput" placeholder="メールアドレスを入力" />
+                <button class="btn btn-primary" id="newsletterBtn">登録する</button>
+                <p class="foot-note">本物の配信はしませんが、UIとしてはちゃんと入力チェックします。空欄登録で通る雑実装にはしません。</p>
+              </div>
+            </section>
+
+            <section class="panel sidebar-panel" id="sidebarEditor">
+              <div class="panel-head">
+                <h3>投稿パネル</h3>
+                <button class="soft-btn" id="toggleEditorBtn">開閉</button>
+              </div>
+              <p class="editor-note">
+                ここからローカル投稿を追加できます。つまり見た目だけじゃなく、実際に自分で記事を増やせます。
+                ローカル保存なのでブラウザに残ります。
+              </p>
+
+              <div class="editor" id="editorBlock">
+                <label>
+                  <span class="field-label">タイトル</span>
+                  <input type="text" id="editorTitle" placeholder="例: 記事UIでやりがちな事故をまとめる" />
+                </label>
+                <label>
+                  <span class="field-label">抜粋</span>
+                  <textarea id="editorExcerpt" placeholder="一覧カードに表示する短い要約"></textarea>
+                </label>
+
+                <div class="editor-grid-2">
+                  <label>
+                    <span class="field-label">カテゴリ</span>
+                    <input type="text" id="editorCategory" placeholder="例: UI設計" />
+                  </label>
+                  <label>
+                    <span class="field-label">タグ（カンマ区切り）</span>
+                    <input type="text" id="editorTags" placeholder="例: UI, ブログ, CSS" />
+                  </label>
+                </div>
+
+                <div class="editor-grid-2">
+                  <label>
+                    <span class="field-label">読了時間（分）</span>
+                    <input type="number" id="editorReadTime" min="1" max="120" placeholder="5" />
+                  </label>
+                  <label>
+                    <span class="field-label">閲覧数（初期値）</span>
+                    <input type="number" id="editorViews" min="0" step="1" placeholder="0" />
+                  </label>
+                </div>
+
+                <label>
+                  <span class="field-label">本文（空行で段落分け）</span>
+                  <textarea id="editorContent" placeholder="ここに本文を書くと、詳細モーダルで段落表示されます。\n\n見出しっぽくしたいなら『## 見出し』で始めてください。\n\n箇条書きは『- 』で始めるとリスト化します。"></textarea>
+                </label>
+
+                <div class="editor-actions">
+                  <button class="btn btn-primary" id="publishBtn">ローカル公開する</button>
+                  <button class="btn" id="saveDraftBtn">下書き保存</button>
+                  <button class="btn" id="restoreDraftBtn">下書き復元</button>
+                  <button class="btn btn-danger" id="clearDraftBtn">下書き削除</button>
+                </div>
+
+                <div class="status-row">
+                  <span class="status-pill" id="draftLengthPill">本文 0文字</span>
+                  <span class="status-pill" id="draftTagPill">タグ 0個</span>
+                  <span class="status-pill" id="draftReadyPill">未入力</span>
+                </div>
+              </div>
+            </section>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-inner">
+        <div>© 2026 気ままブログUI / HTML, CSS, JavaScript only</div>
+        <div class="footer-links">
+          <a href="#top">ホーム</a>
+          <a href="#postsSection">記事一覧</a>
+          <a href="#sidebarPopular">人気</a>
+          <a href="#sidebarEditor">投稿</a>
+          <a href="#sidebarProfile">プロフィール</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <div class="modal" id="postModal" aria-hidden="true">
+    <div class="modal-panel">
+      <div class="modal-top">
+        <strong id="modalTopLabel">記事詳細</strong>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="soft-btn" id="modalSaveBtn">保存</button>
+          <button class="soft-btn" id="modalLikeBtn">いいね</button>
+          <button class="btn" id="modalCloseBtn">閉じる</button>
+        </div>
+      </div>
+      <div class="modal-body" id="modalBodyScroller">
+        <div class="modal-cover"></div>
+        <div class="modal-content-wrap">
+          <article class="modal-main">
+            <div class="modal-meta" id="modalMeta"></div>
+            <h2 class="modal-title" id="modalTitle"></h2>
+            <div class="chips-wrap" id="modalTags"></div>
+            <p class="modal-excerpt" id="modalExcerpt"></p>
+            <div class="article-body" id="modalContent"></div>
+          </article>
+          <aside class="modal-side">
+            <section>
+              <h3 style="margin:0 0 10px; font-size:1rem;">目次</h3>
+              <div class="toc-list" id="modalToc"></div>
+            </section>
+            <section>
+              <h3 style="margin:0 0 10px; font-size:1rem;">関連記事</h3>
+              <div class="related-list" id="modalRelated"></div>
+            </section>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-wrap" id="toastWrap"></div>
+  <button class="back-top" id="backTopBtn" aria-label="ページ上部へ戻る">↑</button>
+
+  <script>
+    (function () {
+      const STORAGE_KEYS = {
+        theme: 'blog-ui-theme-v2',
+        likes: 'blog-ui-likes-v2',
+        saves: 'blog-ui-saves-v2',
+        draft: 'blog-ui-draft-v2',
+        customPosts: 'blog-ui-custom-posts-v2',
+        editorOpen: 'blog-ui-editor-open-v2',
+        viewMode: 'blog-ui-view-mode-v2'
+      };
+
+      const demoPosts = [
+        {
+          id: 1,
+          title: '中学生ブログでもダサく見えない配色の作り方',
+          excerpt: '白基調に青アクセント。この時点でかなり勝ちです。変に色を増やして事故るの、もう見飽きました。',
+          category: 'デザイン',
+          tags: ['配色', 'UI', '初心者'],
+          date: '2026-03-10',
+          readTime: 4,
+          views: 1320,
+          likesBase: 41,
+          featured: true,
+          content: [
+            '## まず結論',
+            '配色はベース、文字、アクセント。この3つをちゃんと整理するだけでかなり見やすくなります。',
+            '## よくある事故',
+            '- 色を多く使いすぎる',
+            '- 装飾色と意味色が混ざる',
+            '- 文字色のコントラストが弱い',
+            '## 最低限のルール',
+            '白基調なら、本文は濃いグレー、リンクや主ボタンだけ青、強調に補助色を少しだけ。これで十分です。',
+            '見た目を派手にしなくても、整理されているだけで読みやすさはかなり変わります。'
+          ]
+        },
+        {
+          id: 2,
+          title: '記事カードに何を載せるべきか、無駄なく整理する',
+          excerpt: 'タイトル、要約、カテゴリ、日付、読了時間。このへんを入れれば十分です。情報を盛りすぎると逆に弱い。',
+          category: 'UI設計',
+          tags: ['カード', '情報設計', '一覧'],
+          date: '2026-03-09',
+          readTime: 5,
+          views: 980,
+          likesBase: 28,
+          featured: false,
+          content: [
+            '## 一覧画面は玄関',
+            '記事一覧はブログの玄関です。ここで「読むかどうか」がほぼ決まります。',
+            '## 載せるべきもの',
+            '- タイトル',
+            '- 短い要約',
+            '- カテゴリ',
+            '- 投稿日',
+            '- 読了時間',
+            '## 載せすぎ注意',
+            'いいね数、コメント数、著者情報、閲覧数、読了率、タグ山盛り……と全部入れると視線が散って終わります。'
+          ]
+        },
+        {
+          id: 3,
+          title: 'スマホ対応を後回しにすると普通に終わる理由',
+          excerpt: '2026年にPCだけ見て満足してるの、かなり危ないです。スマホで崩れた瞬間に読者は帰ります。',
+          category: 'レスポンシブ',
+          tags: ['スマホ', 'CSS', 'レイアウト'],
+          date: '2026-03-08',
+          readTime: 3,
+          views: 1580,
+          likesBase: 47,
+          featured: false,
+          content: [
+            '## 後回しが危険な理由',
+            'スマホ対応は最後に微調整するものではなく、最初から前提に入れるものです。',
+            '## 特に崩れやすい場所',
+            '- ヘッダーのボタン群',
+            '- サイドバーの固定レイアウト',
+            '- 横並びのカード',
+            '## 対策',
+            '最初から「1カラム落ち」を想定して組む。これだけで事故率はかなり下がります。'
+          ]
+        },
+        {
+          id: 4,
+          title: 'プロフィール欄を雑にすると信頼感が死ぬ',
+          excerpt: '何者か分からないブログを読む側の気持ち、少しは考えましょう。小さくてもプロフィールは効きます。',
+          category: '運営',
+          tags: ['プロフィール', '信頼性'],
+          date: '2026-03-07',
+          readTime: 4,
+          views: 740,
+          likesBase: 19,
+          featured: false,
+          content: [
+            '## 匿名でもいい',
+            'ただし完全に情報ゼロだと、読む側は少し構えます。',
+            '## 必要なこと',
+            '何について書くのか、どんな視点なのか、それだけでも伝えておくと十分違います。',
+            '## 逆に不要なこと',
+            '無理に盛った肩書きを並べること。これは逆に嘘くさく見えるので危ないです。'
+          ]
+        },
+        {
+          id: 5,
+          title: '検索欄は地味だけど、ないと普通に不便です',
+          excerpt: 'カテゴリだけで十分とか言ってると、記事が増えた瞬間に詰みます。検索は最初からあった方がいい。',
+          category: '機能',
+          tags: ['検索', 'UX', '導線'],
+          date: '2026-03-06',
+          readTime: 4,
+          views: 1210,
+          likesBase: 35,
+          featured: false,
+          content: [
+            '## なぜ必要か',
+            '検索欄は「褒められないけど、無いと確実に困る」タイプの機能です。',
+            '## カテゴリだけでは足りない理由',
+            'カテゴリはざっくり探すのに向いていますが、ピンポイント検索には弱いです。',
+            '## 最低限やること',
+            'タイトル、要約、タグに対して検索をかけられるだけで十分役に立ちます。'
+          ]
+        },
+        {
+          id: 6,
+          title: 'トップページでやりがちな“盛りすぎ事故”を避ける',
+          excerpt: '機能を増やすのはいい。でも全部主役にするとゴミUIになります。優先順位をつけろという話です。',
+          category: 'トップページ',
+          tags: ['レイアウト', '導線', '優先順位'],
+          date: '2026-03-05',
+          readTime: 6,
+          views: 860,
+          likesBase: 22,
+          featured: false,
+          content: [
+            '## 主役は一つ',
+            'トップページで一番見せたいものを決めないと、全部が中途半端になります。',
+            '## よくある事故',
+            '- バナーだらけ',
+            '- 強い色が多すぎる',
+            '- 人気記事も新着も特集も全部大きい',
+            '## 整理法',
+            '主役、補助、サブ情報。これを分けるだけでかなり落ち着きます。'
+          ]
+        }
+      ];
+
+      const dailyMessages = [
+        '最初から完璧を作ろうとして止まるより、ここまで作ってから削る方が強いです。',
+        '情報を増やすのは簡単。でも読ませる順番を整理するのが本番です。',
+        'デザイン事故の多くは、盛りすぎと優先順位不足で説明がつきます。',
+        '「あとで整える」は、だいたい整わないまま終わります。'
+      ];
+
+      const state = {
+        theme: localStorage.getItem(STORAGE_KEYS.theme) || 'light',
+        likes: JSON.parse(localStorage.getItem(STORAGE_KEYS.likes) || '[]'),
+        saves: JSON.parse(localStorage.getItem(STORAGE_KEYS.saves) || '[]'),
+        draft: JSON.parse(localStorage.getItem(STORAGE_KEYS.draft) || 'null'),
+        customPosts: JSON.parse(localStorage.getItem(STORAGE_KEYS.customPosts) || '[]'),
+        editorOpen: JSON.parse(localStorage.getItem(STORAGE_KEYS.editorOpen) || 'true'),
+        viewMode: localStorage.getItem(STORAGE_KEYS.viewMode) || 'grid',
+        search: '',
+        category: 'all',
+        tag: 'all',
+        sort: 'new',
+        perPage: 6,
+        savedOnly: false,
+        page: 1,
+        modalPostId: null
+      };
+
+      const el = {
+        body: document.body,
+        progressBar: document.getElementById('progressBar'),
+        themeToggle: document.getElementById('themeToggle'),
+        themeToggleMobile: document.getElementById('themeToggleMobile'),
+        mobileToggle: document.getElementById('mobileToggle'),
+        mobilePanel: document.getElementById('mobilePanel'),
+        searchInput: document.getElementById('searchInput'),
+        categorySelect: document.getElementById('categorySelect'),
+        sortSelect: document.getElementById('sortSelect'),
+        perPageSelect: document.getElementById('perPageSelect'),
+        tagFilterRow: document.getElementById('tagFilterRow'),
+        savedOnlyToggle: document.getElementById('savedOnlyToggle'),
+        clearFiltersBtn: document.getElementById('clearFiltersBtn'),
+        cardsGrid: document.getElementById('cardsGrid'),
+        emptyState: document.getElementById('emptyState'),
+        pagination: document.getElementById('pagination'),
+        resultsMeta: document.getElementById('resultsMeta'),
+        popularList: document.getElementById('popularList'),
+        categoryTiles: document.getElementById('categoryTiles'),
+        statPosts: document.getElementById('statPosts'),
+        statViews: document.getElementById('statViews'),
+        statSaved: document.getElementById('statSaved'),
+        dailyMessage: document.getElementById('dailyMessage'),
+        statusPosts: document.getElementById('statusPosts'),
+        statusDraft: document.getElementById('statusDraft'),
+        statusTheme: document.getElementById('statusTheme'),
+        refreshPopularBtn: document.getElementById('refreshPopularBtn'),
+        randomPostBtn: document.getElementById('randomPostBtn'),
+        exportJsonBtn: document.getElementById('exportJsonBtn'),
+        shortcutSaved: document.getElementById('shortcutSaved'),
+        shortcutPopular: document.getElementById('shortcutPopular'),
+        shortcutRecent: document.getElementById('shortcutRecent'),
+        shortcutReset: document.getElementById('shortcutReset'),
+        profilePrimaryBtn: document.getElementById('profilePrimaryBtn'),
+        loadDemoBtn: document.getElementById('loadDemoBtn'),
+        newsletterInput: document.getElementById('newsletterInput'),
+        newsletterBtn: document.getElementById('newsletterBtn'),
+        editorBlock: document.getElementById('editorBlock'),
+        toggleEditorBtn: document.getElementById('toggleEditorBtn'),
+        openEditorBtn: document.getElementById('openEditorBtn'),
+        openEditorBtnMobile: document.getElementById('openEditorBtnMobile'),
+        editorTitle: document.getElementById('editorTitle'),
+        editorExcerpt: document.getElementById('editorExcerpt'),
+        editorCategory: document.getElementById('editorCategory'),
+        editorTags: document.getElementById('editorTags'),
+        editorReadTime: document.getElementById('editorReadTime'),
+        editorViews: document.getElementById('editorViews'),
+        editorContent: document.getElementById('editorContent'),
+        publishBtn: document.getElementById('publishBtn'),
+        saveDraftBtn: document.getElementById('saveDraftBtn'),
+        restoreDraftBtn: document.getElementById('restoreDraftBtn'),
+        clearDraftBtn: document.getElementById('clearDraftBtn'),
+        draftLengthPill: document.getElementById('draftLengthPill'),
+        draftTagPill: document.getElementById('draftTagPill'),
+        draftReadyPill: document.getElementById('draftReadyPill'),
+        postModal: document.getElementById('postModal'),
+        modalTopLabel: document.getElementById('modalTopLabel'),
+        modalMeta: document.getElementById('modalMeta'),
+        modalTitle: document.getElementById('modalTitle'),
+        modalTags: document.getElementById('modalTags'),
+        modalExcerpt: document.getElementById('modalExcerpt'),
+        modalContent: document.getElementById('modalContent'),
+        modalToc: document.getElementById('modalToc'),
+        modalRelated: document.getElementById('modalRelated'),
+        modalCloseBtn: document.getElementById('modalCloseBtn'),
+        modalSaveBtn: document.getElementById('modalSaveBtn'),
+        modalLikeBtn: document.getElementById('modalLikeBtn'),
+        modalBodyScroller: document.getElementById('modalBodyScroller'),
+        toastWrap: document.getElementById('toastWrap'),
+        backTopBtn: document.getElementById('backTopBtn'),
+        viewToggle: document.getElementById('viewToggle')
+      };
+
+      function getAllPosts() {
+        return [...demoPosts, ...state.customPosts].map(post => ({ ...post }));
+      }
+
+      function persistCore() {
+        localStorage.setItem(STORAGE_KEYS.likes, JSON.stringify(state.likes));
+        localStorage.setItem(STORAGE_KEYS.saves, JSON.stringify(state.saves));
+        localStorage.setItem(STORAGE_KEYS.customPosts, JSON.stringify(state.customPosts));
+        localStorage.setItem(STORAGE_KEYS.editorOpen, JSON.stringify(state.editorOpen));
+        localStorage.setItem(STORAGE_KEYS.viewMode, state.viewMode);
+      }
+
+      function setTheme(theme) {
+        state.theme = theme;
+        localStorage.setItem(STORAGE_KEYS.theme, theme);
+        el.body.classList.toggle('dark', theme === 'dark');
+        el.themeToggle.textContent = theme === 'dark' ? '☀ ライト' : '🌙 ダーク';
+        el.themeToggleMobile.textContent = theme === 'dark' ? '☀ ライトモード切替' : '🌙 ダークモード切替';
+        el.statusTheme.textContent = 'テーマ: ' + (theme === 'dark' ? 'Dark' : 'Light');
+      }
+
+      function getCategories(posts) {
+        return ['all', ...new Set(posts.map(post => post.category))];
+      }
+
+      function getTags(posts) {
+        return ['all', ...new Set(posts.flatMap(post => post.tags))];
+      }
+
+      function formatDate(dateStr) {
+        const d = new Date(dateStr);
+        return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+      }
+
+      function safeNumber(value, fallback) {
+        const num = Number(value);
+        return Number.isFinite(num) ? num : fallback;
+      }
+
+      function getPostLikeCount(post) {
+        return post.likesBase + (state.likes.includes(post.id) ? 1 : 0);
+      }
+
+      function getFilteredPosts() {
+        let posts = getAllPosts();
+        const q = state.search.trim().toLowerCase();
+
+        if (q) {
+          posts = posts.filter(post => {
+            return post.title.toLowerCase().includes(q)
+              || post.excerpt.toLowerCase().includes(q)
+              || post.category.toLowerCase().includes(q)
+              || post.tags.some(tag => tag.toLowerCase().includes(q))
+              || post.content.join('\n').toLowerCase().includes(q);
+          });
+        }
+
+        if (state.category !== 'all') {
+          posts = posts.filter(post => post.category === state.category);
+        }
+
+        if (state.tag !== 'all') {
+          posts = posts.filter(post => post.tags.includes(state.tag));
+        }
+
+        if (state.savedOnly) {
+          posts = posts.filter(post => state.saves.includes(post.id));
+        }
+
+        switch (state.sort) {
+          case 'old':
+            posts.sort((a, b) => new Date(a.date) - new Date(b.date));
+            break;
+          case 'popular':
+            posts.sort((a, b) => b.views - a.views);
+            break;
+          case 'likes':
+            posts.sort((a, b) => getPostLikeCount(b) - getPostLikeCount(a));
+            break;
+          case 'readShort':
+            posts.sort((a, b) => a.readTime - b.readTime);
+            break;
+          case 'title':
+            posts.sort((a, b) => a.title.localeCompare(b.title, 'ja'));
+            break;
+          case 'new':
+          default:
+            posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+            break;
+        }
+
+        return posts;
+      }
+
+      function renderCategorySelect() {
+        const categories = getCategories(getAllPosts());
+        el.categorySelect.innerHTML = categories.map(category => {
+          const label = category === 'all' ? 'すべてのカテゴリ' : category;
+          return `<option value="${escapeHtml(category)}">${escapeHtml(label)}</option>`;
+        }).join('');
+        el.categorySelect.value = state.category;
+      }
+
+      function renderTagFilters() {
+        const tags = getTags(getAllPosts());
+        el.tagFilterRow.innerHTML = tags.map(tag => {
+          const label = tag === 'all' ? 'すべて' : tag;
+          return `<button class="tag-pill ${state.tag === tag ? 'active' : ''}" data-tag="${escapeAttr(tag)}">${escapeHtml(label)}</button>`;
+        }).join('');
+      }
+
+      function renderCategoryTiles() {
+        const posts = getAllPosts();
+        const categories = getCategories(posts).filter(c => c !== 'all');
+        el.categoryTiles.innerHTML = categories.map(category => {
+          const count = posts.filter(post => post.category === category).length;
+          return `
+            <button class="category-tile" data-category-tile="${escapeAttr(category)}">
+              <span>${escapeHtml(category)}</span>
+              <small>${count}件</small>
+            </button>
+          `;
+        }).join('');
+      }
+
+      function renderPopular() {
+        const popular = [...getAllPosts()].sort((a, b) => b.views - a.views).slice(0, 5);
+        el.popularList.innerHTML = popular.map((post, index) => `
+          <article class="mini-post" data-open-post="${post.id}">
+            <strong>${index + 1}. ${escapeHtml(post.title)}</strong>
+            <span>${escapeHtml(post.category)} ・ 👁 ${post.views} ・ ❤️ ${getPostLikeCount(post)}</span>
+          </article>
+        `).join('');
+      }
+
+      function renderStats() {
+        const posts = getAllPosts();
+        const views = posts.reduce((sum, post) => sum + post.views, 0);
+        el.statPosts.textContent = posts.length;
+        el.statViews.textContent = views.toLocaleString('ja-JP');
+        el.statSaved.textContent = state.saves.length;
+        el.statusPosts.textContent = `記事 ${posts.length}件`;
+      }
+
+      function renderPosts() {
+        const filtered = getFilteredPosts();
+        const totalPages = Math.max(1, Math.ceil(filtered.length / state.perPage));
+        if (state.page > totalPages) state.page = totalPages;
+        const start = (state.page - 1) * state.perPage;
+        const current = filtered.slice(start, start + state.perPage);
+
+        el.cardsGrid.classList.toggle('list-view', state.viewMode === 'list');
+        el.cardsGrid.innerHTML = current.map(post => renderPostCard(post)).join('');
+        el.emptyState.classList.toggle('hide', current.length !== 0);
+        el.resultsMeta.textContent = `${filtered.length}件ヒット / ${state.page}ページ目`;
+        renderPagination(filtered.length, totalPages);
+        syncViewToggleButtons();
+      }
+
+      function renderPostCard(post) {
+        const liked = state.likes.includes(post.id);
+        const saved = state.saves.includes(post.id);
+        const isList = state.viewMode === 'list';
+        const tagsHtml = post.tags.slice(0, 4).map(tag => `<span class="chip">#${escapeHtml(tag)}</span>`).join('');
+        return `
+          <article class="post-card ${isList ? 'list' : ''}">
+            <div class="post-cover">
+              <div class="cover-overlay">
+                <span class="badge">${escapeHtml(post.category)}</span>
+                <span class="badge">⏱ ${post.readTime}分</span>
+              </div>
+            </div>
+            <div class="post-body">
+              <div class="post-meta">
+                <span>📅 ${formatDate(post.date)}</span>
+                <span>👁 ${post.views}</span>
+                <span>❤️ ${getPostLikeCount(post)}</span>
+                ${post.featured ? '<span>⭐ 注目</span>' : ''}
+              </div>
+              <h3 class="post-title">${escapeHtml(post.title)}</h3>
+              <p class="post-excerpt">${escapeHtml(post.excerpt)}</p>
+              <div class="chips-wrap">${tagsHtml}</div>
+              <div class="post-footer">
+                <div class="muted" style="font-size:.84rem;font-weight:700;">${post.content.join('').length}文字相当</div>
+                <div class="post-actions">
+                  <button class="small-btn ${liked ? 'active-like' : ''}" data-like-post="${post.id}">${liked ? '♥ いいね済' : '♡ いいね'}</button>
+                  <button class="small-btn ${saved ? 'active-save' : ''}" data-save-post="${post.id}">${saved ? '保存済み' : '保存'}</button>
+                  <button class="small-btn" data-open-post="${post.id}">続きを読む</button>
+                </div>
+              </div>
+            </div>
+          </article>
+        `;
+      }
+
+      function renderPagination(totalCount, totalPages) {
+        if (totalCount === 0) {
+          el.pagination.innerHTML = '';
+          return;
+        }
+        let html = '';
+        html += `<button class="page-btn" data-page="${Math.max(1, state.page - 1)}">‹</button>`;
+        for (let i = 1; i <= totalPages; i++) {
+          html += `<button class="page-btn ${state.page === i ? 'active' : ''}" data-page="${i}">${i}</button>`;
+        }
+        html += `<button class="page-btn" data-page="${Math.min(totalPages, state.page + 1)}">›</button>`;
+        el.pagination.innerHTML = html;
+      }
+
+      function syncViewToggleButtons() {
+        [...el.viewToggle.querySelectorAll('button')].forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.view === state.viewMode);
+        });
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function escapeAttr(str) {
+        return escapeHtml(str);
+      }
+
+      function parseContentToHtml(contentLines) {
+        const blocks = [];
+        let listBuffer = [];
+
+        function flushList() {
+          if (listBuffer.length) {
+            blocks.push(`<ul>${listBuffer.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`);
+            listBuffer = [];
+          }
+        }
+
+        contentLines.forEach(line => {
+          const raw = String(line || '');
+          const trimmed = raw.trim();
+          if (!trimmed) {
+            flushList();
+            return;
+          }
+          if (trimmed.startsWith('## ')) {
+            flushList();
+            const title = trimmed.slice(3).trim();
+            const id = slugify(title);
+            blocks.push(`<h3 id="${id}">${escapeHtml(title)}</h3>`);
+            return;
+          }
+          if (trimmed.startsWith('- ')) {
+            listBuffer.push(trimmed.slice(2).trim());
+            return;
+          }
+          flushList();
+          blocks.push(`<p>${escapeHtml(trimmed)}</p>`);
+        });
+
+        flushList();
+        return blocks.join('');
+      }
+
+      function slugify(str) {
+        return str.toLowerCase().replace(/[^a-z0-9ぁ-んァ-ン一-龥]+/g, '-').replace(/^-+|-+$/g, '') || 'section';
+      }
+
+      function buildTocFromLines(contentLines) {
+        return contentLines
+          .map(line => String(line || '').trim())
+          .filter(line => line.startsWith('## '))
+          .map(line => {
+            const title = line.slice(3).trim();
+            return { id: slugify(title), title };
+          });
+      }
+
+      function openPost(id) {
+        const post = getAllPosts().find(p => p.id === id);
+        if (!post) return;
+        state.modalPostId = id;
+
+        el.modalTopLabel.textContent = post.category + ' の記事詳細';
+        el.modalTitle.textContent = post.title;
+        el.modalExcerpt.textContent = post.excerpt;
+        el.modalMeta.innerHTML = `
+          <span>📅 ${formatDate(post.date)}</span>
+          <span>📂 ${escapeHtml(post.category)}</span>
+          <span>⏱ ${post.readTime}分</span>
+          <span>👁 ${post.views}</span>
+          <span>❤️ ${getPostLikeCount(post)}</span>
+        `;
+        el.modalTags.innerHTML = post.tags.map(tag => `<span class="chip">#${escapeHtml(tag)}</span>`).join('');
+        el.modalContent.innerHTML = parseContentToHtml(post.content);
+
+        const tocItems = buildTocFromLines(post.content);
+        el.modalToc.innerHTML = tocItems.length
+          ? tocItems.map(item => `<button class="toc-link" data-toc-target="${escapeAttr(item.id)}">${escapeHtml(item.title)}</button>`).join('')
+          : '<div class="muted" style="font-size:.88rem;line-height:1.8;">見出しがないので目次はありません。</div>';
+
+        const related = getAllPosts()
+          .filter(p => p.id !== post.id)
+          .map(p => ({ ...p, score: relatedScore(post, p) }))
+          .sort((a, b) => b.score - a.score || new Date(b.date) - new Date(a.date))
+          .slice(0, 4);
+
+        el.modalRelated.innerHTML = related.map(item => `
+          <button class="related-item" data-open-post="${item.id}">
+            <strong>${escapeHtml(item.title)}</strong>
+            <span>${escapeHtml(item.category)} ・ score ${item.score}</span>
+          </button>
+        `).join('');
+
+        syncModalButtons();
+        el.postModal.classList.add('open');
+        el.postModal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        el.modalBodyScroller.scrollTop = 0;
+      }
+
+      function relatedScore(base, target) {
+        let score = 0;
+        if (base.category === target.category) score += 3;
+        score += base.tags.filter(tag => target.tags.includes(tag)).length * 2;
+        return score;
+      }
+
+      function closeModal() {
+        el.postModal.classList.remove('open');
+        el.postModal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      function syncModalButtons() {
+        if (state.modalPostId == null) return;
+        const liked = state.likes.includes(state.modalPostId);
+        const saved = state.saves.includes(state.modalPostId);
+        el.modalLikeBtn.textContent = liked ? '♥ いいね済み' : '♡ いいね';
+        el.modalSaveBtn.textContent = saved ? '保存済み' : '保存';
+      }
+
+      function showToast(title, desc) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = `<strong>${escapeHtml(title)}</strong><span>${escapeHtml(desc)}</span>`;
+        el.toastWrap.appendChild(toast);
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateY(8px)';
+        }, 2400);
+        setTimeout(() => toast.remove(), 2800);
+      }
+
+      function toggleLike(id) {
+        if (state.likes.includes(id)) {
+          state.likes = state.likes.filter(v => v !== id);
+          showToast('いいね解除', '派手に押してからやっぱ違うと思ったんですね。正直でよろしい。');
+        } else {
+          state.likes.push(id);
+          showToast('いいね追加', 'ローカルでいいねを記録しました。ちゃんと残ります。');
+        }
+        persistCore();
+        rerender();
+        if (state.modalPostId === id) syncModalButtons();
+      }
+
+      function toggleSave(id) {
+        if (state.saves.includes(id)) {
+          state.saves = state.saves.filter(v => v !== id);
+          showToast('保存解除', '保存リストから外しました。整理できてえらい。');
+        } else {
+          state.saves.push(id);
+          showToast('保存しました', '後で見返せるようにローカル保存しました。');
+        }
+        persistCore();
+        rerender();
+        if (state.modalPostId === id) syncModalButtons();
+      }
+
+      function getDraftFromInputs() {
+        return {
+          title: el.editorTitle.value.trim(),
+          excerpt: el.editorExcerpt.value.trim(),
+          category: el.editorCategory.value.trim(),
+          tags: el.editorTags.value.trim(),
+          readTime: el.editorReadTime.value.trim(),
+          views: el.editorViews.value.trim(),
+          content: el.editorContent.value
+        };
+      }
+
+      function applyDraftToInputs(draft) {
+        if (!draft) return;
+        el.editorTitle.value = draft.title || '';
+        el.editorExcerpt.value = draft.excerpt || '';
+        el.editorCategory.value = draft.category || '';
+        el.editorTags.value = draft.tags || '';
+        el.editorReadTime.value = draft.readTime || '';
+        el.editorViews.value = draft.views || '';
+        el.editorContent.value = draft.content || '';
+        updateDraftStatus();
+      }
+
+      function saveDraft() {
+        const draft = getDraftFromInputs();
+        state.draft = draft;
+        localStorage.setItem(STORAGE_KEYS.draft, JSON.stringify(draft));
+        updateDraftStatus();
+        showToast('下書き保存', 'ブラウザに下書きを保存しました。閉じても残ります。');
+      }
+
+      function clearDraftInputs() {
+        el.editorTitle.value = '';
+        el.editorExcerpt.value = '';
+        el.editorCategory.value = '';
+        el.editorTags.value = '';
+        el.editorReadTime.value = '';
+        el.editorViews.value = '';
+        el.editorContent.value = '';
+        updateDraftStatus();
+      }
+
+      function restoreDraft() {
+        const draft = JSON.parse(localStorage.getItem(STORAGE_KEYS.draft) || 'null');
+        if (!draft) {
+          showToast('下書きなし', '復元できる下書きが見当たりません。空振りでしたね。');
+          return;
+        }
+        applyDraftToInputs(draft);
+        showToast('下書き復元', '保存済みの下書きをフォームに戻しました。');
+      }
+
+      function removeDraft() {
+        localStorage.removeItem(STORAGE_KEYS.draft);
+        state.draft = null;
+        clearDraftInputs();
+        showToast('下書き削除', '保存していた下書きを削除しました。');
+      }
+
+      function updateDraftStatus() {
+        const data = getDraftFromInputs();
+        const contentLength = data.content.trim().length;
+        const tagCount = data.tags.split(',').map(v => v.trim()).filter(Boolean).length;
+        const filled = [data.title, data.excerpt, data.category, data.content.trim()].filter(Boolean).length;
+
+        el.draftLengthPill.textContent = `本文 ${contentLength}文字`;
+        el.draftTagPill.textContent = `タグ ${tagCount}個`;
+        el.statusDraft.textContent = `下書き ${contentLength}文字`;
+
+        const readyPill = el.draftReadyPill;
+        readyPill.className = 'status-pill';
+        if (filled >= 4 && contentLength >= 30) {
+          readyPill.textContent = '公開候補';
+          readyPill.classList.add('good');
+        } else if (filled >= 2) {
+          readyPill.textContent = '入力途中';
+          readyPill.classList.add('warn');
+        } else {
+          readyPill.textContent = '未入力';
+          readyPill.classList.add('bad');
+        }
+      }
+
+      function publishPost() {
+        const data = getDraftFromInputs();
+        const tags = data.tags.split(',').map(v => v.trim()).filter(Boolean);
+        const contentLines = data.content.split(/\n+/).map(v => v.trim()).filter(Boolean);
+
+        if (!data.title || !data.excerpt || !data.category || !contentLines.length) {
+          showToast('入力不足', 'タイトル・抜粋・カテゴリ・本文は最低限入れてください。そこを空で公開は無理です。');
+          return;
+        }
+
+        const readTime = Math.max(1, safeNumber(data.readTime, estimateReadTime(contentLines.join(' '))));
+        const views = Math.max(0, safeNumber(data.views, 0));
+        const id = generateNextId();
+
+        const post = {
+          id,
+          title: data.title,
+          excerpt: data.excerpt,
+          category: data.category,
+          tags: tags.length ? tags : ['メモ'],
+          date: new Date().toISOString().slice(0, 10),
+          readTime,
+          views,
+          likesBase: 0,
+          featured: false,
+          content: contentLines
+        };
+
+        state.customPosts.unshift(post);
+        persistCore();
+        localStorage.removeItem(STORAGE_KEYS.draft);
+        state.draft = null;
+        clearDraftInputs();
+        renderCategorySelect();
+        renderCategoryTiles();
+        renderTagFilters();
+        rerender();
+        showToast('ローカル公開完了', '記事を追加しました。ブラウザを閉じても残ります。');
+      }
+
+      function estimateReadTime(text) {
+        const chars = String(text || '').replace(/\s+/g, '').length;
+        return Math.max(1, Math.ceil(chars / 280));
+      }
+
+      function generateNextId() {
+        const ids = getAllPosts().map(post => post.id);
+        return Math.max(...ids, 0) + 1;
+      }
+
+      function exportJson() {
+        const data = {
+          exportedAt: new Date().toISOString(),
+          posts: getAllPosts(),
+          likes: state.likes,
+          saves: state.saves
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'blog-ui-data.json';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        showToast('JSON出力', '現在の投稿データをJSONとして書き出しました。');
+      }
+
+      function resetDemoOnly() {
+        state.customPosts = [];
+        state.likes = [];
+        state.saves = [];
+        persistCore();
+        rerender();
+        renderCategorySelect();
+        renderCategoryTiles();
+        renderTagFilters();
+        showToast('デモ再読込', '追加したローカル記事や反応をリセットしました。');
+      }
+
+      function subscribeNewsletter() {
+        const value = el.newsletterInput.value.trim();
+        const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+        if (!value) {
+          showToast('未入力', 'メールアドレスが空です。何も入れずに登録はさすがに無理です。');
+          return;
+        }
+        if (!ok) {
+          showToast('形式エラー', 'メールアドレスの形式が怪しいです。そこは直してください。');
+          return;
+        }
+        showToast('登録完了（UI上）', '実送信はしませんが、入力チェックまではちゃんと通しました。');
+        el.newsletterInput.value = '';
+      }
+
+      function updateProgressBar() {
+        const total = document.documentElement.scrollHeight - window.innerHeight;
+        const ratio = total > 0 ? (window.scrollY / total) * 100 : 0;
+        el.progressBar.style.width = ratio + '%';
+      }
+
+      function updateBackTopVisibility() {
+        el.backTopBtn.classList.toggle('show', window.scrollY > 260);
+      }
+
+      function scrollToEditor() {
+        document.getElementById('sidebarEditor').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      function setViewMode(mode) {
+        state.viewMode = mode;
+        localStorage.setItem(STORAGE_KEYS.viewMode, mode);
+        renderPosts();
+      }
+
+      function clearAllFilters() {
+        state.search = '';
+        state.category = 'all';
+        state.tag = 'all';
+        state.sort = 'new';
+        state.savedOnly = false;
+        state.page = 1;
+        el.searchInput.value = '';
+        el.categorySelect.value = 'all';
+        el.sortSelect.value = 'new';
+        el.savedOnlyToggle.checked = false;
+        renderTagFilters();
+        renderPosts();
+      }
+
+      function rerender() {
+        renderStats();
+        renderPopular();
+        renderPosts();
+      }
+
+      function bindEvents() {
+        el.themeToggle.addEventListener('click', () => setTheme(state.theme === 'dark' ? 'light' : 'dark'));
+        el.themeToggleMobile.addEventListener('click', () => setTheme(state.theme === 'dark' ? 'light' : 'dark'));
+        el.mobileToggle.addEventListener('click', () => el.mobilePanel.classList.toggle('open'));
+        el.searchInput.addEventListener('input', e => {
+          state.search = e.target.value;
+          state.page = 1;
+          renderPosts();
+        });
+        el.categorySelect.addEventListener('change', e => {
+          state.category = e.target.value;
+          state.page = 1;
+          renderPosts();
+        });
+        el.sortSelect.addEventListener('change', e => {
+          state.sort = e.target.value;
+          state.page = 1;
+          renderPosts();
+        });
+        el.perPageSelect.addEventListener('change', e => {
+          state.perPage = Number(e.target.value);
+          state.page = 1;
+          renderPosts();
+        });
+        el.savedOnlyToggle.addEventListener('change', e => {
+          state.savedOnly = e.target.checked;
+          state.page = 1;
+          renderPosts();
+        });
+        el.clearFiltersBtn.addEventListener('click', clearAllFilters);
+        el.refreshPopularBtn.addEventListener('click', () => {
+          renderPopular();
+          showToast('人気記事更新', '並びを再描画しました。まあ今も同じですが。');
+        });
+        el.randomPostBtn.addEventListener('click', () => {
+          const posts = getAllPosts();
+          const random = posts[Math.floor(Math.random() * posts.length)];
+          if (random) openPost(random.id);
+        });
+        el.exportJsonBtn.addEventListener('click', exportJson);
+        el.shortcutSaved.addEventListener('click', () => {
+          state.savedOnly = true;
+          el.savedOnlyToggle.checked = true;
+          state.page = 1;
+          renderPosts();
+        });
+        el.shortcutPopular.addEventListener('click', () => {
+          state.sort = 'popular';
+          el.sortSelect.value = 'popular';
+          state.page = 1;
+          renderPosts();
+        });
+        el.shortcutRecent.addEventListener('click', () => {
+          state.sort = 'new';
+          el.sortSelect.value = 'new';
+          state.page = 1;
+          renderPosts();
+        });
+        el.shortcutReset.addEventListener('click', clearAllFilters);
+        el.profilePrimaryBtn.addEventListener('click', () => showToast('プロフィール', 'ここは遷移の代わりにトーストを出しています。次に別ページ化すれば完成度がさらに上がります。'));
+        el.loadDemoBtn.addEventListener('click', resetDemoOnly);
+        el.newsletterBtn.addEventListener('click', subscribeNewsletter);
+        el.toggleEditorBtn.addEventListener('click', () => {
+          state.editorOpen = !state.editorOpen;
+          persistCore();
+          el.editorBlock.classList.toggle('hide', !state.editorOpen);
+        });
+        el.openEditorBtn.addEventListener('click', scrollToEditor);
+        el.openEditorBtnMobile.addEventListener('click', () => {
+          el.mobilePanel.classList.remove('open');
+          scrollToEditor();
+        });
+        el.publishBtn.addEventListener('click', publishPost);
+        el.saveDraftBtn.addEventListener('click', saveDraft);
+        el.restoreDraftBtn.addEventListener('click', restoreDraft);
+        el.clearDraftBtn.addEventListener('click', removeDraft);
+
+        [el.editorTitle, el.editorExcerpt, el.editorCategory, el.editorTags, el.editorReadTime, el.editorViews, el.editorContent].forEach(input => {
+          input.addEventListener('input', updateDraftStatus);
+        });
+
+        el.cardsGrid.addEventListener('click', handleDelegatedClicks);
+        el.popularList.addEventListener('click', handleDelegatedClicks);
+        el.categoryTiles.addEventListener('click', handleDelegatedClicks);
+        el.pagination.addEventListener('click', handleDelegatedClicks);
+        el.tagFilterRow.addEventListener('click', handleDelegatedClicks);
+        el.modalToc.addEventListener('click', handleDelegatedClicks);
+        el.modalRelated.addEventListener('click', handleDelegatedClicks);
+        el.postModal.addEventListener('click', e => {
+          if (e.target === el.postModal) closeModal();
+        });
+        el.modalCloseBtn.addEventListener('click', closeModal);
+        el.modalSaveBtn.addEventListener('click', () => {
+          if (state.modalPostId != null) toggleSave(state.modalPostId);
+        });
+        el.modalLikeBtn.addEventListener('click', () => {
+          if (state.modalPostId != null) toggleLike(state.modalPostId);
+        });
+
+        window.addEventListener('scroll', () => {
+          updateProgressBar();
+          updateBackTopVisibility();
+        });
+        window.addEventListener('keydown', e => {
+          if (e.key === 'Escape') closeModal();
+        });
+        el.backTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        el.viewToggle.addEventListener('click', e => {
+          const btn = e.target.closest('button[data-view]');
+          if (!btn) return;
+          setViewMode(btn.dataset.view);
+        });
+      }
+
+      function handleDelegatedClicks(e) {
+        const openBtn = e.target.closest('[data-open-post]');
+        if (openBtn) {
+          openPost(Number(openBtn.dataset.openPost));
+          return;
+        }
+
+        const likeBtn = e.target.closest('[data-like-post]');
+        if (likeBtn) {
+          toggleLike(Number(likeBtn.dataset.likePost));
+          return;
+        }
+
+        const saveBtn = e.target.closest('[data-save-post]');
+        if (saveBtn) {
+          toggleSave(Number(saveBtn.dataset.savePost));
+          return;
+        }
+
+        const pageBtn = e.target.closest('[data-page]');
+        if (pageBtn) {
+          state.page = Number(pageBtn.dataset.page);
+          renderPosts();
+          document.getElementById('postsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return;
+        }
+
+        const categoryBtn = e.target.closest('[data-category-tile]');
+        if (categoryBtn) {
+          state.category = categoryBtn.dataset.categoryTile;
+          state.page = 1;
+          el.categorySelect.value = state.category;
+          renderPosts();
+          return;
+        }
+
+        const tagBtn = e.target.closest('[data-tag]');
+        if (tagBtn) {
+          state.tag = tagBtn.dataset.tag;
+          state.page = 1;
+          renderTagFilters();
+          renderPosts();
+          return;
+        }
+
+        const tocBtn = e.target.closest('[data-toc-target]');
+        if (tocBtn) {
+          const target = el.modalContent.querySelector('#' + CSS.escape(tocBtn.dataset.tocTarget));
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+      }
+
+      function initDailyMessage() {
+        const dayIndex = new Date().getDate() % dailyMessages.length;
+        el.dailyMessage.textContent = dailyMessages[dayIndex];
+      }
+
+      function hydrateDraftAndEditor() {
+        if (state.draft) applyDraftToInputs(state.draft);
+        el.editorBlock.classList.toggle('hide', !state.editorOpen);
+        updateDraftStatus();
+      }
+
+      function init() {
+        setTheme(state.theme);
+        initDailyMessage();
+        el.savedOnlyToggle.checked = state.savedOnly;
+        el.sortSelect.value = state.sort;
+        el.perPageSelect.value = String(state.perPage);
+        renderCategorySelect();
+        renderTagFilters();
+        renderCategoryTiles();
+        rerender();
+        hydrateDraftAndEditor();
+        bindEvents();
+        updateProgressBar();
+        updateBackTopVisibility();
+        syncViewToggleButtons();
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>
